@@ -12,7 +12,7 @@ module Promo
 
     has_many :histories, :class_name => 'Promo::History', :foreign_key => "promo_promocode_id"
     has_many :carts, through: :histories
-    has_many :orders, through: :histories
+    has_many :reservations, through: :histories
 
     validates :code, uniqueness: true
 
