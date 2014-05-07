@@ -22,10 +22,15 @@ module Promo
 
         return discount_for_product(promocode, product_list) if promocode.has_product?
         if promocode.is_percentage?
-          calculate_percentage product_list.map(&:value).reduce(:+), promocode.value
+          total = product_list.map{ |i| i.single_value }.reduce(:+)
+          val = calculate_percentage total, promocode.value
         else
-          promocode.value
+          val = promocode.value
         end
+        puts "discount_for ----------------"
+        puts val
+        puts "----------------"
+        val
       end
 
       # Calculates the dicount for a specific product in the list
@@ -35,7 +40,8 @@ module Promo
       #  product_list: array with the products to be evaluated
       def discount_for_product promocode, product_list
         product = promocode.product
-        return 0 unless product_list.include? product
+        products = product_list.collect{|p| p.product}
+        return 0 unless products.include? product
         if promocode.is_percentage?
           calculate_percentage(product.value,promocode.value)
         else
@@ -45,7 +51,14 @@ module Promo
 
       #calculates the percentage to a specific value
       def calculate_percentage(value, percent)
-        (value * (percent.to_f/100)).to_i
+        value = value || 0
+        total = (value * (percent.to_f/100)).to_i
+        puts "calculate_percentage--------------------------------------"
+        puts value
+        puts percent
+        puts total
+        puts "--------------------------------------"
+        total
       end
     end
   end

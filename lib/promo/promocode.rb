@@ -9,10 +9,12 @@ module Promo
     private_class_method :create
 
     belongs_to :product, polymorphic: true
+    belongs_to :user
 
     has_many :histories, :class_name => 'Promo::History', :foreign_key => "promo_promocode_id"
     has_many :carts, through: :histories
     has_many :reservations, through: :histories
+
 
     validates :code, uniqueness: true
 
@@ -117,7 +119,8 @@ module Promo
       if self.has_product?
         logger.debug "#------------ Promocode associated with a product"
         raise InvalidPromocode.new 'promocode.messages.invalid_use' if options[:product_list].nil?
-        if self.product && !options[:product_list].include?(self.product)
+        products = options[:product_list].collect{|p| p.product }
+        if self.product && !products.include?(self.product)
           logger.debug "#--------------- Product associated not found on the list"
           raise InvalidPromoProduct.new 'promocode.messages.not_valid_for'
         end
@@ -128,7 +131,8 @@ module Promo
       if self.product_id.nil? && !self.product_type.nil?
         logger.debug "#------------ Promocode associated with a class"
         raise InvalidPromocode.new 'promocode.messages.invalid_use' if options[:product_list].nil?
-        if options[:product_list].none? { |p| p.class.to_s == self.product_type }
+        products = options[:product_list].collect{|p| p.product }
+        if products.none? { |p| p.class.to_s == self.product_type }
           logger.debug "#--------------- Class associated not found on the list"
           raise InvalidPromoProduct.new 'promocode.messages.must_have_course'
         end
