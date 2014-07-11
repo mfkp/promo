@@ -18,7 +18,7 @@ module Promo
 
     validates :code, uniqueness: true
 
-    scope :last, -> { where(status: Promo::STATUS[:valid]).order(id: :desc).limit(10) }
+    scope :valid, -> { where(status: Promo::STATUS[:valid]).order(id: :desc).limit(10) }
     scope :used, -> { where(status: Promo::STATUS[:used]).order(used_at: :desc) }
     scope :invalid, -> { where(status: Promo::STATUS[:invalid]).order(used_at: :desc) }
     scope :expired, -> { where("status = ? OR expires < ?", Promo::STATUS[:expired], Time.now).order(expires: :desc) }
